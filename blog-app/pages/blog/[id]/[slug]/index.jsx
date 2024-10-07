@@ -1,13 +1,13 @@
 import Sidebar from '@/components/Sidebar';
 import Details from '@/components/Details';
-import { queryPost } from '../../../api'
+import { queryPost, queryCategories } from '../../../api'
 
-export default function Blog({ results }) {
+export default function Blog({ data, categories }) {
   return (
     <>
       <div className="flex gap-6 p-10">
-        <Sidebar />
-        <Details result={ results && results.length ? results[0] : null} />
+        <Sidebar categories={categories} />
+        <Details result={ data && data.length ? data[0] : null} />
       </div>
     </>
   );
@@ -16,17 +16,36 @@ export default function Blog({ results }) {
 export async function getServerSideProps({ params }) {
   if (!params.id && params.slug) { return { props: {} } }
   const query = {
-    where: { 
-      type: 'blog',
-      id: Number(params.id),
-      // content: { equals: { slug: params.slug } }
+    where: {
+      AND: [
+        {
+          id: Number(params.id),
+        },
+        {
+          type: 'blog',
+        },
+        {
+          content: {
+            equals: params.slug,
+            path: '$.slug'
+          }
+        }
+      ]
     }
   }
-  const results = await queryPost(query)
-  // console.log(results)
+  const data = await queryPost(query)
+
+  const query2 = {
+    orderBy: {
+      title: 'desc',
+    }
+  }
+  const categories = await queryCategories(query2)
+
   return {
     props: {
-      results
+      data,
+      categories
     }
   }
 }

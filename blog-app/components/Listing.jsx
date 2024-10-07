@@ -1,3 +1,4 @@
+import 'tailwindcss/tailwind.css'
 import Item from '@/components/Item';
 import { Typography, ThemeProvider } from './ui/MaterialUI';
 // const NEXT_URL = process.env.NEXT_PUBLIC_API_URL

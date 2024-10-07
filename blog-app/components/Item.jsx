@@ -51,7 +51,6 @@ export default function Item({ result, action }) {
     setIsSaving(false)
     router.push('/blog/my');
   }
-
   return (
     <>
       <Card className="w-full flex-row">
@@ -71,20 +70,30 @@ export default function Item({ result, action }) {
           /> */}
         </CardHeader>
         <CardBody>
-          <Typography className="mb-4 uppercase text-blue-900 text-xs font-medium">
-            { result?.content?.categories[0] }
-          </Typography>
+          <div className="mb-4 flex gap-2 items-center">
+            {
+              result?.content?.categories?.map((cat, index) => (
+                <Link href={`/blog/category/${cat?.id}`} className="capitalize text-blue-900 text-sm font-medium" key={index}>
+                  {cat?.title}
+                </Link>
+              ))
+              .reduce((prev, curr) => [prev, ' • ', curr])
+            }
+          </div>
           <Link href={`/blog/${result?.id}/${result?.content?.slug}`} className="w-full">
             <Typography variant="h5" color="blue-gray" className="mb-2 hover:text-blue-900">
               { result?.title }
             </Typography>
           </Link>
-          <Typography color="gray" className="mb-8 font-normal">
+          <Typography className="mb-8 font-normal text-lg text-gray-800">
             {
               sanitized.length > 130
                 ? sanitized.substring(0, 134).concat('...')
                 : sanitized
             }
+          </Typography>
+          <Typography color="gray" className="mb-8 font-normal text-sm">
+            Date Created: {(new Date(result.createdAt)).toDateString()}
           </Typography>
         </CardBody>
         { action &&

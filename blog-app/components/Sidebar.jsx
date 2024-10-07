@@ -1,7 +1,7 @@
 import { Button, List, ListItem, Card, Typography } from './ui/MaterialUI';
 import Link from 'next/link';
 
-export default function Sidebar() {
+export default function Sidebar({ categories }) {
   return (
     <>
       <Card className="w-[14.5rem] rounded-md pt-3">
@@ -22,9 +22,11 @@ export default function Sidebar() {
         </div>
         <Typography className='p-4 text-base font-bold' color="blue-gray">Categories</Typography>
         <List className='p-0 border-t border-[#eee]'>
-          <ListItem className='hover:text-[#0059A5] hover:bg-[#DEEBF9] p-4 rounded-none'>Books</ListItem>
-          <ListItem className='hover:text-[#0059A5] hover:bg-[#DEEBF9] p-4 rounded-none'>Music</ListItem>
-          <ListItem className='hover:text-[#0059A5] hover:bg-[#DEEBF9] p-4 rounded-none'>Video</ListItem>
+          {categories.map((category, index) => (
+            <ListItem key={index} className='hover:text-[#0059A5] hover:bg-[#DEEBF9] p-4 rounded-none'>
+              <Link href={`/blog/category/${category.id}`} className="w-full">{category.title}</Link>
+            </ListItem>
+          ))}
         </List>
       </Card>
     </>

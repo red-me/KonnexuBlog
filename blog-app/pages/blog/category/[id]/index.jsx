@@ -1,38 +1,43 @@
-import 'tailwindcss/tailwind.css'
 import Sidebar from '@/components/Sidebar';
 import Listing from '@/components/Listing';
-import { queryPost, queryCategories } from '../api'
+import { queryPost, queryCategories } from '../../../api'
 
-export default function Home({ data, categories}) {
+export default function PostByCategory({ data, categories, title }) {
   return (
     <>
       <div className="flex gap-6 p-10">
         <Sidebar categories={categories} />
-        <Listing title='All Blogs' results={data && data.length ? data : []}/>
+        <Listing results={ data && data.length ? data : []} title={title} />
       </div>
     </>
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps({ params }) {
+  if (!params.id) { return { props: {} } }
+  const categoryId = parseInt(params.id); 
   const query = {
     where: {
-      type: 'blog',
-      deleted: false,
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
+      AND: [
+        {
+          type: 'blog',
+        },
+        {
+          content: {
+            array_contains: categoryId,
+            path: '$.categories'
+          }
+        }
+      ]
+    }
   }
   const results = await queryPost(query)
-
   const query2 = {
     orderBy: {
       title: 'desc',
     }
   }
   const categories = await queryCategories(query2)
-
   const getDataByIds = (arr, ids) => {
     return arr
       .filter(item => ids.includes(item.id))
@@ -50,10 +55,18 @@ export async function getStaticProps() {
       }
     }
   })
+
+  let title = ''
+  const category_data = categories.find(item => item.id === categoryId)
+  if (category_data && category_data?.title) {
+    title = category_data?.title
+  }
+
   return {
     props: {
       data,
-      categories
+      categories,
+      title
     }
   }
 }

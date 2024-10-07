@@ -70,3 +70,22 @@ export const mutatePost = async (dataObj) => {
     return [{'error': error.message}];
   }
 }
+
+export const queryCategories = async (query) => {
+  try {
+    const response = await fetch(`${next_url}/api/postcategories/query`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query })
+    });
+    if (!response.ok) {
+      return [{'error': 'Network response was not ok'}];
+    }
+    return await response.json();
+  } catch (error) {
+    return [{'error': error.message}];
+  }
+}

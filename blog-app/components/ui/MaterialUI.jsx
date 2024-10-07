@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardBody,
   CardFooter,
+  Chip,
   Dialog,
   DialogHeader,
   DialogBody,
@@ -18,6 +19,8 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Select,
+  Option,
   Typography,
   ThemeProvider,
 } from "@material-tailwind/react";
@@ -28,6 +31,7 @@ export {
   CardHeader,
   CardBody,
   CardFooter,
+  Chip,
   Dialog,
   DialogHeader,
   DialogBody,
@@ -40,6 +44,8 @@ export {
   MenuHandler,
   MenuList,
   MenuItem,
+  Select,
+  Option,
   Typography,
   ThemeProvider
 };
