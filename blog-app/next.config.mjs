@@ -25,7 +25,6 @@ const nextConfig = {
           filename: 'static/chunks/remoteEntry.js',
           remotes: {},
           exposes: {
-            './shop': './pages/shop/index.jsx',
             './blog': './pages/blog/index.jsx',
           },
           shared: {
