@@ -1,0 +1,45 @@
+{
+  "name": "host-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.1.1",
+    "@material-tailwind/react": "^2.1.8",
+    "@module-federation/utilities": "^3.0.5",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "formik": "^2.2.9",
+    "hamburger-react": "^2.5.0",
+    "html5-file-selector": "^2.1.0",
+    "immutability-helper": "^3.1.1",
+    "module-federation-import-remote": "^1.0.24",
+    "next": "^14.2.3",
+    "react": "^18",
+    "react-calendar": "^4.8.0",
+    "react-children-utilities": "^2.10.0",
+    "react-color": "^2.19.3",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^18",
+    "react-dropzone-uploader": "^2.11.0",
+    "react-html-parser": "^2.0.2",
+    "react-quill": "^2.0.0",
+    "react-toastify": "^10.0.4",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.16",
+    "@types/react": "18.2.55",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "5.3.3"
+  }
+}

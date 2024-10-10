@@ -64,7 +64,6 @@ const LoadRoutes = () => {
   app.use('/api/usergroups', require('./routes/userGroups'));
   app.use('/api/feed', require('./routes/feeds'));
   app.use('/api/post', require('./routes/posts'));
-  app.use('/api/postcategories', require('./routes/postCategories'));
   app.use('/api/file', require('./routes/uploads'));
   app.use('/api/app', require('./routes/apps'));
   app.use('/api/theme', require('./routes/themes'));

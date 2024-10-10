@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+* , .mBody {
+  scrollbar-width: thin!important;
+  scrollbar-color: transparent!important
+}
+
+::-webkit-scrollbar {
+  width: 0!important;
+  height: 0!important
+}
+
+::-webkit-scrollbar-track {
+  background: 0 0!important
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent!important;
+  border-radius: 0!important;
+  border: none!important
+}
+
+.hover-item .hover-backdrop {
+  transition: all 400ms ease-in-out;
+  position: absolute;
+  opacity: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(33, 33, 33, 1) 0%,
+    rgba(33, 33, 33, 0) 100%
+  );
+  /* background: rgba(33,33,33,125); */
+}
+.hover-item:hover .hover-backdrop {
+  opacity: 1;
+}
+
+.hover-item .hover-show {
+  transition: all 400ms ease-in-out;
+  opacity: 0;
+}
+
+.hover-item:hover .hover-show {
+  opacity: 1;
+}
+
+.hover-item .hover-img {
+  transition: all 1s ease-in-out;
+  transform: scale(1.25);
+}
+.hover-item:hover .hover-img {
+  transform: scale(1);
+}
+
+.hover-item .hover-label {
+  transition: all 300ms ease-in-out;
+
+  opacity: 0;
+}
+.hover-item:hover .hover-label {
+  opacity: 1;
+}
+
+.image-gallery img {
+  transition: all 600ms ease-in-out;
+  opacity: 0;
+  width: 0px;
+}
+
+.image-gallery img.show {
+  opacity: 1;
+  width: auto;
+}
+
+.album-cover img {
+  transition: all 500ms ease-in-out;
+  opacity: 1;
+  transform: rotate(0deg);
+}
+.album-cover img:nth-child(1) {
+  z-index: 98;
+  
+}
+.album-cover img:nth-child(2) {
+  z-index: 99;
+  
+}
+.album-cover img:nth-child(3) {
+  z-index: 100;
+}
+.album-cover img:nth-child(3) {
+  transform: rotate(3deg) ;
+}
+.album-cover img:nth-child(2) {
+  transform: rotate0deg) ;
+ 
+}
+
+.album-cover img:nth-child(1) {
+  transform:  rotate(-3deg) ;
+ 
+}
+
+/* .hover-pop {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+  
+  transform: rotate(45deg) scale(1);
+}
+.hover-pop:hover {
+  transform: scale(1.7);
+}
+ */

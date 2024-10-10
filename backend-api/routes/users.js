@@ -1,0 +1,499 @@
+
+const express = require('express')
+const path = require('path')
+const { rateLimit3x10 } = require("../middleware/ratelimit");
+const { createId } = require('@paralleldrive/cuid2');
+var router = express.Router();
+
+
+const { prisma } = require("../services/prisma/db")
+
+const User = prisma.user;
+const Profile = prisma.profile;
+
+//auth thingy
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const { delay } = require("../utils/utilities")
+
+
+const auth = require('../middleware/auth');
+
+const { encrypt, compare } = require('../utils/crypt')
+
+
+router.post('/register', /* [rateLimit3x10], */ async (req, res) => {
+    try {
+        const { email, firstName, lastName, password } = req.body
+
+        const encryptedPassword = await encrypt(password)
+        const user = await User.create({
+            data: {
+                email,
+                password: encryptedPassword,
+                active: true,
+                profile: {
+                    create: {
+                        firstName, lastName
+                    },
+                },
+            },
+        })
+
+        delete user.password;
+        res.json(user)
+    } catch (e) {
+        res.status(200).json({ error: e })
+    }
+})
+
+// test only
+router.get('/all', async (req, res) => {
+    try {
+
+        const users = await User.findMany()
+
+        res.json({ users });
+    } catch (e) {
+        res.status(200).json({ error: e.message })
+    }
+})
+
+
+router.post('/login',/*  [rateLimit3x10], */ async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const user = await User.findFirst({
+            where: {
+                email,
+
+                active: true
+            },
+
+        })
+
+        if (!user) { return res.status(200).json({ error: 'Incorrect email address or password.' }) }
+
+        const isValid = await compare(
+            password,
+            user.password
+        );
+
+        if (!isValid) {
+            res.status(200).json({ error: 'Password does not match.' })
+        }
+
+
+
+
+        const sessionToken = createId()
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { sessionToken: sessionToken },
+        })
+
+
+
+        const payload = {
+            v: sessionToken,
+        };
+
+        console.log(`User Logged-in: ${user.id} => ${email}.`)
+        const userOut = await User.findFirst({
+            include: {
+                profile: true,
+                userGroup: true,
+            },
+            where: {
+                id: user.id,
+
+                active: true
+            },
+        })
+
+        delete userOut.password;
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET || 'meowmeow2',
+            { expiresIn: '5 days' },
+            (err, token) => {
+                if (err) throw err;
+
+
+                res.json({ token, user: userOut });
+            }
+        );
+    } catch (e) {
+        res.json({ error: e.message })
+    }
+})
+
+router.post('/adminlogin',/*  [rateLimit3x10], */ async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const user = await User.findFirst({
+            where: {
+                email,
+                active: true
+            },
+            include: {
+                userGroup: true
+            }
+
+        })
+
+        if (!user) { return res.status(200).json({ error: 'Incorrect email address or password.' }) }
+
+        if (user && user.userGroup.name !== 'Administrator') { return res.status(200).json({ error: 'Forbidden.' }) }
+
+        const isValid = await compare(
+            password,
+            user.password
+        );
+
+        if (!isValid) {
+            return res.status(200).json({ error: 'Password does not match.' })
+        }
+
+
+
+
+
+        const sessionToken = createId()
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { sessionToken: sessionToken },
+        })
+
+        const userOut = await User.findFirst({
+            include: {
+                profile: true,
+                userGroup: true
+            },
+            where: {
+                id: user.id,
+
+                active: true
+            },
+        })
+
+        const payload = {
+            v: sessionToken,
+        };
+
+
+        delete userOut.password;
+
+        console.log(`User Logged-in: ${user.id} => ${email}.`)
+
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET || 'meowmeow2',
+            { expiresIn: '5 days' },
+            (err, token) => {
+                if (err) throw err;
+
+
+                res.status(200).json({ token, user: userOut });
+            }
+        );
+    } catch (e) {
+        res.status(200).json({ error: e.message })
+    }
+})
+
+// @route    GET api/auth
+// @desc     Get user by token
+// @access   Private
+router.get('/current', auth, async (req, res) => {
+    try {
+        // await delay(3000)
+        //req.userId is generated by 'auth' middleware if
+        const user = await User.findFirst({
+            include: {
+                profile: true,
+                userGroup: true
+            },
+            where: {
+                id: req.userId,
+
+                active: true
+            },
+        })
+
+        delete user.password;
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+
+
+// @route    GET api/auth
+// @desc     Get user by token
+// @access   Private
+router.get('/name/:name', auth, async (req, res) => {
+    try {
+        await delay(3000)
+        const { name } = req.params
+        //req.userId is generated by 'auth' middleware if
+        const user = await User.findFirst({
+            include: {
+                profile: true,
+            },
+            where: {
+                name: name,
+
+                active: true
+            },
+        })
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+
+
+// @route    GET api/auth
+// @desc     Get user by token
+// @access   Private
+router.get('/:id', auth, async (req, res) => {
+    try {
+        await delay(3000)
+        const { id } = req.params
+        //req.userId is generated by 'auth' middleware if
+        const user = await User.findFirst({
+            include: {
+                profile: true,
+            },
+            where: {
+                id: parseInt(id),
+
+                active: true
+            },
+        })
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+
+router.delete('/:id', async (req, res) => {
+
+    const { id } = req.params
+    const user = await prisma.user.delete({
+        where: {
+            id,
+        },
+    })
+    res.json(user)
+})
+
+router.post('/update', async (req, res) => {
+    const { id, firstName, lastName, name, email } = req.body
+
+    //await delay(3000)
+    //validate: email not duplicate : todo: use lib
+
+    const userByEmail = await prisma.user.findFirst({
+        where: { id: { not: id }, email: email }
+
+    })
+
+    if (userByEmail) {
+        return res.json({ error: 'Email Address not allowed.' });
+
+    }
+
+    if (name && name.trim().length > 0) {
+        //validate: profile.name not duplicate : todo: use lib
+        const userByName = await prisma.user.findFirst({
+            where: { id: { not: id }, name: name }
+
+        })
+
+        if (userByName) {
+            return res.json({ error: 'Username is already taken, or is a reserved word.' });
+        }
+    }
+    const user = await prisma.user.update({
+        where: { id },
+        data: { name, email },
+    })
+
+    const profile = await prisma.profile.update({
+        where: { userId: user.id },
+        data: { firstName, lastName },
+    })
+
+    const updatedUser = await User.findFirst({
+        include: {
+            profile: true,
+        },
+        where: {
+            id: parseInt(id),
+
+            active: true
+        },
+    })
+    return res.json(updatedUser);
+})
+
+router.post('/updatepassword', async (req, res) => {
+    const { id, oldPassword, newPassword, tries } = req.body
+
+    //await delay(3000)
+
+    const userByIdPassword = await prisma.user.findFirst({
+        where: { id }
+
+    })
+
+    //validate// old==new 
+    //validate: test password validity : todo: use lib
+    if (oldPassword == newPassword) {
+        return res.json({ error: 'The current Password is the same with the new password.' });
+    }
+
+
+
+
+
+    const isValid = await compare(
+        oldPassword,
+        userByIdPassword.password
+    );
+
+
+    if (!isValid) {
+        return res.json({ error: 'The current password is incorrect.' });
+
+    }
+
+    // simulate long checks...
+    await delay(3000)
+
+    const encryptedPassword = await encrypt(newPassword)
+    await prisma.user.update({
+        where: { id },
+        data: { password: encryptedPassword },
+    })
+
+
+    const updatedUser = await User.findFirst({
+        include: {
+            profile: true,
+        },
+        where: {
+            id: parseInt(id),
+
+            active: true
+        },
+    })
+    return res.json(updatedUser);
+})
+
+
+router.get('/profile', auth, async (req, res) => {
+    try {
+        //req.userId is generated by 'auth' middleware if
+        const profile = await Profile.findFirst({
+            where: {
+                userId: req.userId,
+
+            },
+        })
+        res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+//utility 
+router.post('/query', async (req, res) => {
+
+    try {
+        const { query } = req.body
+
+        // await delay(5000)
+        var q = query
+
+        const results = await User.findMany({
+            ...q,
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                active: true,
+                profile: true,
+                userGroupId: true,
+                privacySettings: true,
+                privacySettingsId: true,
+                userGroup: true,
+                createdAt: true,
+                updatedAt: true,
+                lastActivity: true,
+                lastIPAddress: true
+            }
+        });
+
+        res.json(results)
+    }
+    catch (e) {
+        res.status(200).json({ error: e.message })
+    }
+})
+
+router.post('/count', async (req, res) => {
+
+    try {
+        const { query } = req.body
+
+
+        var q = query
+
+        const results = await User.count(q);
+
+        res.json(results)
+    }
+    catch (e) {
+        res.status(200).json({ error: e.message })
+    }
+})
+
+router.post('/mutate', async (req, res) => {
+
+    try {
+        const { type, query } = req.body
+
+
+        // make sure its either create or update only for now.
+        const mutate = User[type == 'create' ? 'create' : 'update']
+
+        //must validate and refactor data for password
+
+        if (query.data.password) {
+            query.data.password = await encrypt(query.data.password)
+        }
+        const results = await mutate(query);
+
+        res.json(results)
+    }
+    catch (e) {
+        res.status(200).json({ error: e.message })
+    }
+})
+
+
+
+module.exports = router;
