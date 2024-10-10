@@ -13,7 +13,10 @@ const index = (props) => {
         accept = "image/*,audio/*,video/*",
         minSizeBytes = 0,
         maxSizeBytes = 10485760,
-        maxFiles = 20
+        maxFiles = 20,
+        dropTitle = "Drag and drop here",
+        addTitle = "Add another",
+        formatTitle = "SVG, PNG, JPG or GIF (MAX. 800x400px)"
     } = props;
 
 
@@ -36,17 +39,17 @@ const index = (props) => {
 
     }
     const onFileChange = ({ meta, file, xhr }, status) => {
-        console.log(status, meta, file)
+        // console.log(status, meta, file)
 
         if (status == 'done') {
             const url = `${NEXT_URL}/api/file/download/${JSON.parse(xhr.response).url}`;
-            console.log(url);
+            // console.log(url);
             setFileUrls(prev => [...prev, url]);
         }
     }
     const onSubmit = (files, allFiles) => {
         // allFiles.forEach(f => f.remove())
-        console.log(allFiles)
+        // console.log(allFiles)
     }
     const getFilesFromEvent = e => {
         return new Promise(resolve => {
@@ -64,14 +67,16 @@ const index = (props) => {
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                 </svg>
                 {files.length == 0 && <>
-                    <p className="flex-1 mb-2 text-sm text-gray-500 dark:text-gray-400"> Drag and drop here</p>
-                    <p className="flex-1 text-center text-xs text-gray-500 dark:text-gray-400 ">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                    <p className="flex-1 mb-2 text-sm text-gray-500 dark:text-gray-400">{dropTitle}</p>
+                    <p className="flex-1 text-center text-xs text-gray-500 dark:text-gray-400 ">{formatTitle}</p>
                 </>}
                 {files.length > 0 && <>
-                    <p className="flex-1 mb-2 text-sm text-gray-500 dark:text-gray-400"> Add another</p>
+                    <p className="flex-1 mb-2 text-sm text-gray-500 dark:text-gray-400">{addTitle}</p>
 
                 </>}
                 <input
+                    id="fileuploader"
+                    name="fileuploader"
                     style={{ display: 'none' }}
                     type="file"
                     accept={accept}

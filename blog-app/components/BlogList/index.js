@@ -3,6 +3,7 @@ import Sidebar from '../Sidebar'
 import Listing from '../Listing'
 import AddEdit from '../AddEdit';
 import ConfirmDialog from '../ConfirmDialog';
+import Submenu from '../Submenu';
 
 export default function index(props) {
   const { hostReact, query, path, user, app, router, mutate } = props
@@ -13,9 +14,7 @@ export default function index(props) {
   const [dialogOpen, setDialogOpen] = hostReact.useState(false);
   // const [isSaving, setIsSaving] = hostReact.useState(false);
   const [postData, setPostData] = hostReact.useState([])
-  const [catTitle, setCatTitle] = hostReact.useState([])
-
-  const submenu = { 'All Blogs': 'blog', 'My Blogs': 'my' }
+  const [catTitle, setCatTitle] = hostReact.useState('')
 
   hostReact.useEffect(() => {
     const name = path[1]?.toLowerCase();
@@ -47,6 +46,7 @@ export default function index(props) {
           AND: [
             {
               type: 'blog',
+              deleted: false,
             },
             {
               content: {
@@ -107,11 +107,7 @@ export default function index(props) {
   
   return (
     <>
-      <div className="block bg-white w-full shadow top-14 z-1 py-2">
-        <div className="mx-auto w-full  max-w-screen-xl  flex gap-2 items-center h-8">
-          {submenu && Object.keys(submenu).map(p => <div className="text-sm text-black cursor-pointer" onClick={() => { router.push(`/${path[0]}/${submenu[p]}`) }}>{p}</div>)}
-        </div>
-      </div>
+      <Submenu {...props}></Submenu>
       <div className="mx-auto w-full max-w-screen-xl pt-2.5">
         <div className='w-full flex gap-4 pt-5 py-10'>
           <Sidebar {...props} handleClick={() => handleAdd()}></Sidebar>

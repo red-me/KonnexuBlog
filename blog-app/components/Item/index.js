@@ -2,7 +2,7 @@ import React from 'react'
 import EditBlogMenu from '../AddEdit/EditBlogMenu';
 
 export default function Item(props) {
-  const { post, action, hostReact, controls, handleEdit, handleDelete } = props
+  const { post, action, hostReact, controls, handleEdit, handleDelete, theme } = props
   const [sanitized, setSanitized] = hostReact.useState('');
   const {
     Card,
@@ -27,15 +27,15 @@ export default function Item(props) {
         <CardHeader
           shadow={false}
           floated={false}
-          className="m-0 shrink-0 rounded-r-none"
+          className="m-0 shrink-0 rounded-r-none flex items-center p-4"
         >
-          <div style={{backgroundImage: `url("${post?.content?.photo?.url}")` }} className="bg-contain bg-no-repeat bg-center block w-40 h-40"></div>
+          <div style={{backgroundImage: `url("${post?.content?.photo?.url}")` }} className="bg-contain bg-no-repeat bg-center block w-40 h-40 rounded-sm border border-gray-200"></div>
         </CardHeader>
         <CardBody>
           <div className="mb-4 flex gap-2 items-center">
             {
               post?.content?.categories?.map((cat, index) => (
-                <a href={`/blog/category/${cat?.id}`} className="capitalize text-blue-900 text-sm font-medium" key={index}>
+                <a href={`/blog/category/${cat?.id}`} className="capitalize text-sm font-medium" style={{ color: theme.data.button_primary.style.backgroundColor }} key={index}>
                   {cat?.title}
                 </a>
               ))

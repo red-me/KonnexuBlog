@@ -48,7 +48,7 @@ const InnerPage = ({ slug, currentUserId }) => {
     //url:/app/x/y/z
 
     //if matches app names... todo: get app names from backend
-    if (['helloapp', 'photos', 'test'].indexOf(name) > -1) {
+    if (['helloapp', 'photos', 'test', 'blog'].indexOf(name) > -1) {
         return <AppPage params={{ slug }} > </AppPage>
     }
 
