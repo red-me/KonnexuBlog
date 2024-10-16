@@ -110,6 +110,7 @@ const Dropzone = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     triggerFileUpload: handleUpload, // Expose the fetchData method to be called from outside
+    triggerRemoveAll: removeAll, // Expose the fetchData method to be called from outside
   }));
 
   return (

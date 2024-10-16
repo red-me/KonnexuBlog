@@ -1,5 +1,4 @@
 import React from 'react'
-import { convertToSlug } from '../utilities/common'
 export default function Sidebar(props) {
 
     const { path, controls, app, router, theme, handleClick } = props
@@ -15,7 +14,6 @@ export default function Sidebar(props) {
     const categories = app?.settings?.categories.filter(c=>c.active)
 
     const handleRedirect = (c) => {
-        // const name = convertToSlug(c.name)
         router.push(`/${path[0]}/${c.id}/${c.slug}`)
     }
     return (
@@ -35,7 +33,7 @@ export default function Sidebar(props) {
                 </Typography>
             </div>
             <List className="p-2">
-                {categories && categories.map(c => <ListItem style={{ background: category === c ? '#cccccc' : '' }} onClick={() => handleRedirect(c)}>{c.name}</ListItem>)}
+                {categories && categories.map(c => <ListItem key={c.id} style={{ background: category === c ? '#cccccc' : '' }} onClick={() => handleRedirect(c)}>{c.name}</ListItem>)}
             </List>
         </Card>
     );

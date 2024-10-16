@@ -95,36 +95,40 @@ export default function Details(props) {
                 </Typography>
               </div>
             </div>
-            <div className="mb-4 flex gap-2 items-center">
-              {
-                data?.content?.categories?.map((id, index) => (
-                  <a href={`/blog/category/${id}`} className="capitalize text-sm font-medium" style={{ color: theme.data.button_primary.style.backgroundColor }} key={index}>
-                    {getCatTitle(id)}
-                  </a>
-                ))
-                .reduce((prev, curr) => [prev, ' • ', curr])
-              }
-            </div>
+            { data?.content?.categories &&
+              <div className="mb-4 flex gap-2 items-center">
+                {
+                  data?.content?.categories?.map((id, index) => (
+                    <a href={`/blog/category/${id}`} className="capitalize text-sm font-medium" style={{ color: theme.data.button_primary.style.backgroundColor }} key={index}>
+                      {getCatTitle(id)}
+                    </a>
+                  ))
+                  .reduce((prev, curr) => [prev, ' • ', curr])
+                }
+              </div>
+            }
             <div className="text-black">
               <div dangerouslySetInnerHTML={{ __html: data?.description }} />
             </div>
-            <div className="flex flex-col gap-2 pt-5">
-              <Typography className="font-bold text-lg">Attachments</Typography>
-              <ul className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10'>
-                {data?.content?.photos.map((file, index) => (
-                  <li key={index} className='relative h-32 rounded-md shadow-sm'>
-                    <a href={file} target="_blank">
-                      <img
-                        src={file}
-                        width={100}
-                        height={100}
-                        className='h-full w-full object-contain rounded-md'
-                      />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            { data?.content?.photos &&
+              <div className="flex flex-col gap-2 pt-5">
+                <Typography className="font-bold text-lg">Attachments</Typography>
+                <ul className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10'>
+                  {data?.content?.photos.map((file, index) => (
+                    <li key={index} className='relative h-32 rounded-md shadow-sm'>
+                      <a href={file} target="_blank">
+                        <img
+                          src={file}
+                          width={100}
+                          height={100}
+                          className='h-full w-full object-contain rounded-md'
+                        />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            }
           </CardBody>
         </Card>
       </div>

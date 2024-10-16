@@ -58,18 +58,20 @@ export default function Item(props) {
       <div className="w-full text-black">
         <div dangerouslySetInnerHTML={{ __html: item?.content }} />
       </div>
-      <ul className='mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10'>
-        {item?.meta?.files.map((file, index) => (
-          <li key={index} className='relative h-32 rounded-md shadow-sm'>
-            <img
-              src={file}
-              width={100}
-              height={100}
-              className='h-full w-full object-contain rounded-md'
-            />
-          </li>
-        ))}
-      </ul>
+      { item?.meta?.files?.length > 0 &&
+        <ul className='mt-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-10'>
+          {item?.meta?.files.map((file, index) => (
+            <li key={index} className='relative h-32 rounded-md shadow-sm'>
+              <img
+                src={file}
+                width={100}
+                height={100}
+                className='h-full w-full object-contain rounded-md'
+              />
+            </li>
+          ))}
+        </ul>
+      }
     </ListItem>
   );
 }

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Reply` MODIFY `content` VARCHAR(5000) NOT NULL DEFAULT '';

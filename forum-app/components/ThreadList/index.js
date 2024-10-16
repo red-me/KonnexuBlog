@@ -4,7 +4,7 @@ import ThreadItem from '../ThreadItem'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 
-export const PAGE_SIZE = 3
+export const PAGE_SIZE = 10
 export default function ThreadList(props) {
   const { controls, components, hostReact, hostReactQuery, useFormik, theme, path, user, mutate, query, count } = props
   const { Card, CardBody, List } = controls
@@ -13,6 +13,7 @@ export default function ThreadList(props) {
   const childRef = hostReact.useRef()
   const queryClient = hostReactQuery.useQueryClient()
   const [page, setPage] = hostReact.useState(1)
+  const targetDivRef = hostReact.useRef(null);
 
   hostReact.useEffect(() => {
     setPost(
@@ -71,9 +72,9 @@ export default function ThreadList(props) {
 
   function getReplyQueryOptions(page) {
     return {
-      queryKey: ['repos', { page }],
+      queryKey: ['replythreads', { page }],
       queryFn: () => fetchdata(page),
-      staleTime: 10 * 1000
+      staleTime: 1 * 1000
     }
   }
   function useReply(page) {
@@ -142,10 +143,18 @@ export default function ThreadList(props) {
   const handleUpdate = async(data) => {
     const result = await childRef.current.triggerFileUpload();
     await mutateReplyFn({ id: data.id, content: data.description, meta: { files: result } })
+    formik.setFieldValue('description', '');
+    await childRef.current.triggerRemoveAll();
+    scrollToDiv();
   }
 
   const handleOnChange = (content) => {
     formik.setFieldValue('description', content);
+  };
+
+  const scrollToDiv = () => {
+    // This will scroll to the div element
+    targetDivRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   if (liststatus === 'pending') {
@@ -159,7 +168,7 @@ export default function ThreadList(props) {
   return (
     <div className="mx-auto w-full max-w-screen-xl">
       <Card className="my-6 w-full p-0">
-        <CardBody style={{ opacity: isPlaceholderData ? 0.5 : 1 }} className="p-0">
+        <CardBody ref={targetDivRef} style={{ opacity: isPlaceholderData ? 0.5 : 1 }} className="p-0">
           { totalthreadstatus === 'success' && totalthread > PAGE_SIZE &&
             <div className='flex items-center justify-end gap-4 p-4'>
               <button
