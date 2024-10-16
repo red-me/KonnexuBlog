@@ -24,6 +24,7 @@ import Uploaded from "../../../../../../components/admincp/Apps/Uploaded"
 import AppSettings from "../../../../../../components/admincp/Apps/AppSettings"
 import Store from "../../../../../../components/admincp/Apps/Store"
 import History from "../../../../../../components/admincp/Apps/History"
+import BlogCategories from "../../../../../../components/admincp/Apps/BlogCategories"
 
 
 const NEXT_URL = process.env.NEXT_PUBLIC_API_URL
@@ -62,7 +63,7 @@ export default function Home({ params: { slug } }) {
             {listType == 'store' && <Store {...props}></Store>}
             {listType == 'history' && <History {...props}></History>}
             {listType == 'uploaded' && <Uploaded {...props}></Uploaded>}
-
+            {listType == 'blog' && <BlogCategories {...props}></BlogCategories>}
           </PageBody>
         </PostProvider>
       </AppProvider>

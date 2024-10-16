@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,50 +14,70 @@ model Post {
   title       String         @default("") @db.VarChar(255)
   description String         @default("") @db.VarChar(5000)
   type        String         @db.VarChar(25)
-  content     Json?          @default("{}")
+  content     Json?
   published   Boolean        @default(false)
-  author      User           @relation(fields: [authorId], references: [id])
   authorId    Int
-  tags        Tag[]
-  activities  Activity[]
-  categories  PostCategory[]
   deleted     Boolean        @default(false)
+  activities  Activity[]
+  replies     Reply[]
+  author      User           @relation(fields: [authorId], references: [id])
+  categories  PostCategory[] @relation("PostToPostCategory")
+  tags        Tag[]          @relation("PostToTag")
+
+  @@index([authorId], map: "Post_authorId_fkey")
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  content   String
+  meta      Json?
+  post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Activity {
   id        Int      @id @default(autoincrement())
   type      String
-  post      Post?    @relation(fields: [postId], references: [id])
   postId    Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  post      Post?    @relation(fields: [postId], references: [id])
+
+  @@index([postId], map: "Activity_postId_fkey")
 }
 
 model Tag {
   id        Int      @id @default(autoincrement())
   name      String
-  posts     Post[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  posts     Post[]   @relation("PostToTag")
 }
 
 model PostCategory {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
-  app         App      @relation(fields: [appId], references: [id])
-  posts       Post[]
+  slug        String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   appId       Int
+  app         App      @relation(fields: [appId], references: [id])
+  posts       Post[]   @relation("PostToPostCategory")
+
+  @@index([appId], map: "PostCategory_appId_fkey")
 }
 
 model Country {
-  id     String  @id @default(cuid())
-  iso    String?
-  name   String?
-  active Boolean @default(true)
-
+  id        String     @id @default(cuid())
+  iso       String?
+  name      String?
+  active    Boolean    @default(true)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   provinces Province[]
@@ -70,10 +87,12 @@ model Province {
   id        String   @id @default(cuid())
   name      String?
   active    Boolean  @default(true)
-  country   Country? @relation(fields: [countryId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   countryId String?
+  country   Country? @relation(fields: [countryId], references: [id])
+
+  @@index([countryId], map: "Province_countryId_fkey")
 }
 
 model User {
@@ -82,65 +101,64 @@ model User {
   password          String
   name              String           @unique @default(cuid())
   active            Boolean
-  posts             Post[]
-  profile           Profile?
-  privacySettings   PrivacySettings? @relation(fields: [privacySettingsId], references: [id])
-  userGroup         UserGroup?       @relation(fields: [userGroupId], references: [id])
   sessionToken      String           @default("")
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  userGroupId       Int?
   lastActivity      DateTime         @default(now())
   lastIPAddress     String           @default("")
+  userGroupId       Int?
   privacySettingsId Int?
+  posts             Post[]
+  replies           Reply[]
+  profile           Profile?
+  privacySettings   PrivacySettings? @relation(fields: [privacySettingsId], references: [id])
+  userGroup         UserGroup?       @relation(fields: [userGroupId], references: [id])
+
+  @@index([privacySettingsId], map: "User_privacySettingsId_fkey")
+  @@index([userGroupId], map: "User_userGroupId_fkey")
 }
 
 model Profile {
-  id          Int     @id @default(autoincrement())
-  displayName String  @default("")
-  firstName   String?
-  lastName    String?
-  avatar      String?
-  user        User    @relation(fields: [userId], references: [id])
-  userId      Int     @unique
-
-  location        String? @default("")
-  city            String? @default("")
-  zip             String? @default("")
-  gender          String? @default("")
-  dob             String? @default("")
-  tz              String? @default("")
-  spamCount       Int?    @default(0)
-  primaryLanguage String? @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  firstName       String?
+  lastName        String?
+  avatar          String?
+  userId          Int      @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  city            String?  @default("")
+  displayName     String   @default("")
+  dob             String?  @default("")
+  gender          String?  @default("")
+  location        String?  @default("")
+  primaryLanguage String?  @default("")
+  spamCount       Int?     @default(0)
+  tz              String?  @default("")
+  zip             String?  @default("")
+  user            User     @relation(fields: [userId], references: [id])
 }
 
 model PrivacySettings {
-  id Int @id @default(autoincrement())
-
-  userId Int @unique
-
-  whoCanViewProfilePage                 String? @default("")
-  whoCanViewProfilePageInfoTab          String? @default("")
-  whoCanViewBasicInfo                   String? @default("")
-  whoCanViewLocation                    String? @default("")
-  whoCanViewProfilePageActivities       String? @default("")
-  whoCanPostOnWall                      String? @default("")
-  whoCanViewFriendsList                 String? @default("")
-  whoCanSendFriendRequest               String? @default("")
-  whoCanSendMessage                     String? @default("")
-  whoCanViewProfilePagePhotos           String? @default("")
-  whoCanSendPokes                       String? @default("")
-  whoCanDisplayRSSSubscriberCount       String? @default("")
-  whoCanSubscribeToRSS                  String? @default("")
-  whoCanViewProfilePageRecentlyViewedBy String? @default("")
-  whoCanTagMe                           String? @default("")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User[]
+  id                                    Int      @id @default(autoincrement())
+  userId                                Int      @unique
+  whoCanViewProfilePage                 String?  @default("")
+  whoCanViewProfilePageInfoTab          String?  @default("")
+  whoCanViewBasicInfo                   String?  @default("")
+  whoCanViewLocation                    String?  @default("")
+  whoCanViewProfilePageActivities       String?  @default("")
+  whoCanPostOnWall                      String?  @default("")
+  whoCanViewFriendsList                 String?  @default("")
+  whoCanSendFriendRequest               String?  @default("")
+  whoCanSendMessage                     String?  @default("")
+  whoCanViewProfilePagePhotos           String?  @default("")
+  whoCanSendPokes                       String?  @default("")
+  whoCanDisplayRSSSubscriberCount       String?  @default("")
+  whoCanSubscribeToRSS                  String?  @default("")
+  whoCanViewProfilePageRecentlyViewedBy String?  @default("")
+  whoCanTagMe                           String?  @default("")
+  createdAt                             DateTime @default(now())
+  updatedAt                             DateTime @updatedAt
+  User                                  User[]
 }
 
 model UserGroup {
@@ -177,8 +195,8 @@ model SiteSetting {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  theme     Theme?   @relation(fields: [themeId], references: [id])
   themeId   String?  @unique
+  theme     Theme?   @relation(fields: [themeId], references: [id])
 }
 
 model Theme {
@@ -188,11 +206,11 @@ model Theme {
   name                    String       @unique
   description             String       @default("") @db.VarChar(5000)
   featured                Boolean      @default(false)
-  data                    Json?        @default("{}")
-  brandLogoUrl            String       @default("")
-  brandBackgroundPhotoUrl String       @default("")
-  SiteSetting             SiteSetting?
+  data                    Json?
   deleted                 Boolean      @default(false)
+  brandBackgroundPhotoUrl String       @default("")
+  brandLogoUrl            String       @default("")
+  SiteSetting             SiteSetting?
 }
 
 model Menu {
@@ -201,6 +219,6 @@ model Menu {
   updatedAt   DateTime @updatedAt
   name        String   @unique
   description String   @default("") @db.VarChar(5000)
-  data        Json?    @default("[]")
+  data        Json?
   deleted     Boolean  @default(false)
 }

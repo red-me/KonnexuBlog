@@ -122,8 +122,12 @@ router.post(
                 aboutFiles.push(await prisma.file.create(about));
             }));
 
-
-            res.json({ url: aboutFiles[0].id })
+            if (req.body.multiresults) {
+                res.json({ urls: aboutFiles })
+            } else {
+                res.json({ url: aboutFiles[0].id })
+            }
+            
 
             //res.send('file uploaded successfully.');
 

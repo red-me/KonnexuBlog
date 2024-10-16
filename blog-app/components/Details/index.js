@@ -54,8 +54,8 @@ export default function Details(props) {
         <div className='w-full flex gap-4 pt-5 py-10'>
           <Card className="mt-6 w-full">
             <CardHeader className="p-0 m-0 rounded-none relative w-full">
-              <div style={{ backgroundImage: `url(${post?.content?.photo?.url})` }} className="w-full h-80 bg-no-repeat bg-contain bg-center"></div>
-              <div style={{ backgroundImage: `url(${post?.content?.photo?.url})` }} className="absolute z-10 bg-[#ededed] bg-no-repeat bg-cover bg-center blur-3xl w-full h-full"></div>
+              <div style={{ backgroundImage: `url(${post?.content?.photo?.url})` }} className="relative z-10 w-full h-80 bg-no-repeat bg-contain bg-center"></div>
+              <div style={{ backgroundImage: `url(${post?.content?.photo?.url})` }} className="absolute top-0 z-0 bg-[#ededed] bg-no-repeat bg-cover bg-center blur-3xl w-full h-full"></div>
             </CardHeader>
             <CardBody>
               <div className="mb-4 flex gap-2 items-center">

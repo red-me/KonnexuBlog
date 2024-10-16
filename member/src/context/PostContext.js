@@ -236,10 +236,25 @@ export const PostProvider = ({ children }) => {
 
   };
 
+  const count = async (document, query) => {
+    if (token.length == 0) {
+      throw (new Error('Not Authorized.'))
+    }
+
+    const res = await fetch(`${NEXT_URL}/api/post/count`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', },
+      body: JSON.stringify({ document, query }),
+    });
+
+    const data = await res.json();
+
+    return data
+  }
 
 
   return (
-    <PostContext.Provider value={{ activities, posts, isError, isLoading, create, update, isCreatingPost, isUpdatingPost, query,query2, mutate }}>
+    <PostContext.Provider value={{ activities, posts, isError, isLoading, create, update, isCreatingPost, isUpdatingPost, query,query2, mutate, count }}>
       {children}
     </PostContext.Provider>
   );

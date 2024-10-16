@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { injectScript } from '@module-federation/utilities';
 import { importRemote } from "module-federation-import-remote";
 import { useRouter } from 'next/navigation';
+import * as ReactQuery from '@tanstack/react-query'
 
 import * as MaterialTailwindControls from "@material-tailwind/react";
 const NEXT_URL = process.env.NEXT_PUBLIC_API_URL
@@ -16,6 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // import common components that will be used by apps
 import FileUploadComponent from "../BasicFileUploadComponent"
+import Dropzone from "../Dropzone"
 import SelectOne from "../SelectOne"
 import SelectMultiple from "../SelectMultiple"
 
@@ -43,7 +45,7 @@ const AppPage = ({ params }) => {
     //const { app } = router.query; 
     const { slug } = params;
     const { user, isLoading } = useContext(AuthContext)
-    const { query, mutate } = useContext(PostContext)
+    const { count, query, mutate } = useContext(PostContext)
 
     /*    const apps = {
            "helloapp": { url: `${NEXT_URL}/files/apps/hello`, scope: 'HELLO', module: 'HelloWorld' },
@@ -99,13 +101,15 @@ const AppPage = ({ params }) => {
     const props = {
         path: slug,
         controls: MaterialTailwindControls,
-        components: { FileUploadComponent, SelectOne, SelectMultiple, Toastify },
+        components: { Dropzone, FileUploadComponent, SelectOne, SelectMultiple, Toastify },
         user: user,
         data: { message: 'Greetings to all!', photos: ["https://picsum.photos/600/400", "https://picsum.photos/600/400", "https://picsum.photos/600/400"], },
         app: appConfig,
         hostReact: React,
+        hostReactQuery: ReactQuery,
         router,
         query,
+        count,
         mutate,
         useFormik,
         createId,

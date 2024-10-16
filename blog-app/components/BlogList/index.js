@@ -6,7 +6,7 @@ import ConfirmDialog from '../ConfirmDialog';
 import Submenu from '../Submenu';
 
 export default function index(props) {
-  const { hostReact, query, path, user, app, router, mutate } = props
+  const { hostReact, query, path, user, app, mutate } = props
   const [posts, setPosts] = hostReact.useState([])
   const [page, setPage] = hostReact.useState('')
   const [isOpen, setIsOpen] = hostReact.useState(false)
